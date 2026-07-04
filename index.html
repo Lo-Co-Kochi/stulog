@@ -1,0 +1,1195 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>すたログ 📚 勉強きろくタイマー</title>
+<meta name="description" content="すたログ — 科目を選んで再生するだけの、かわいい勉強記録タイマー。勉強時間が見える化できるよ。">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📚</text></svg>">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-180.png">
+<meta name="theme-color" content="#8fb7f2">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="すたログ">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@500;700;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --accent: #8fb7f2;        /* パステルブルー */
+    --accent-deep: #7b88ee;   /* ペリウィンクル */
+    --lavender: #c3a6ff;
+    --mint: #8ce3d0;
+    --coral: #ff9d9d;
+    --sun: #ffd166;
+    --text: #4e4a5e;
+    --text-soft: #948da0;
+    --card: #ffffff;
+    --radius: 22px;
+    --shadow: 0 8px 24px rgba(137, 132, 201, .16);
+  }
+  *{ margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  html,body{ height:100%; }
+  body{
+    font-family:'Zen Maru Gothic','Hiragino Maru Gothic ProN','Yu Gothic UI',sans-serif;
+    font-weight:500;
+    color:var(--text);
+    background:linear-gradient(165deg,#ffeae1 0%,#fff7d9 25%,#e6f7e7 50%,#e0f0ff 75%,#f0e5ff 100%);
+    background-attachment:fixed;
+    min-height:100vh;
+    padding:18px 14px 40px;
+  }
+  .wrap{ max-width:480px; margin:0 auto; display:flex; flex-direction:column; gap:16px; }
+
+  /* ---------- header ---------- */
+  header{ text-align:center; padding:6px 0 2px; }
+  .logo{
+    font-size:34px; font-weight:900; letter-spacing:.04em;
+    background:linear-gradient(90deg,#ff9d76,#eabb45,#6bbf74,#5fa8ee,#a58cf2);
+    -webkit-background-clip:text; background-clip:text; color:transparent;
+    display:inline-block;
+  }
+  .tagline{ font-size:12px; color:var(--text-soft); margin-top:2px; }
+
+  /* ---------- cards ---------- */
+  .card{
+    background:var(--card); border-radius:var(--radius);
+    box-shadow:var(--shadow); padding:18px;
+  }
+  .card-title{
+    font-size:13px; font-weight:700; color:var(--text-soft);
+    display:flex; align-items:center; gap:6px; margin-bottom:10px;
+  }
+
+  /* ---------- today ---------- */
+  .today-total{
+    font-size:38px; font-weight:900; text-align:center; color:var(--accent-deep);
+    line-height:1.2;
+  }
+  .today-total small{ font-size:16px; font-weight:700; margin-left:2px; }
+  .today-breakdown{ display:flex; flex-wrap:wrap; gap:6px; justify-content:center; margin-top:10px; }
+  .bd-chip{
+    font-size:12px; font-weight:700; padding:5px 12px; border-radius:999px;
+    background:linear-gradient(90deg,#fff2e6,#e9f2ff,#f0e9ff); color:var(--text);
+    display:inline-flex; align-items:center; gap:5px;
+  }
+  .bd-chip b{ color:var(--accent-deep); }
+  .today-empty{ text-align:center; font-size:12px; color:var(--text-soft); margin-top:8px; }
+
+  .subj-dot{
+    display:inline-block; width:9px; height:9px; border-radius:50%; flex:none;
+  }
+
+  /* ---------- timer ---------- */
+  .sec-label{ font-size:11px; font-weight:700; color:var(--text-soft); margin:8px 2px 6px; }
+  .chips{ display:flex; flex-wrap:wrap; gap:6px; justify-content:center; }
+  .chips.shake{ animation:shake .4s; }
+  @keyframes shake{ 0%,100%{transform:translateX(0)} 25%{transform:translateX(-6px)} 75%{transform:translateX(6px)} }
+  .chip{
+    border:2px solid transparent; font-family:inherit; font-size:13px; font-weight:700; cursor:pointer;
+    padding:7px 14px; border-radius:999px; color:var(--text);
+    transition:transform .12s;
+    display:inline-flex; align-items:center; gap:5px;
+  }
+  .chip:active{ transform:scale(.93); }
+  .chip.selected{ border-color:var(--accent-deep); box-shadow:0 3px 10px rgba(123,136,238,.3); }
+  .chip .x{ font-size:11px; color:#a06a6a; margin-left:2px; }
+  .chip-tools{ display:flex; gap:14px; justify-content:center; margin-top:8px; }
+  .chip-tool{
+    border:none; background:none; cursor:pointer; font-family:inherit;
+    font-size:11px; font-weight:700; color:var(--text-soft); text-decoration:underline;
+  }
+
+  .note-input{
+    width:100%; border:2px solid #f0e6f2; border-radius:14px;
+    padding:10px 14px; font-size:14px; font-family:inherit; font-weight:700;
+    color:var(--text); background:#fcfbff; outline:none; text-align:center;
+    transition:border-color .2s;
+  }
+  .note-input::placeholder{ color:#c9c3d6; font-weight:500; }
+  .note-input:focus{ border-color:var(--lavender); }
+  .note-input:disabled{ background:#f3f2fa; }
+
+  .clock{
+    text-align:center; font-size:52px; font-weight:900; letter-spacing:.03em;
+    margin:14px 0 4px; color:var(--text); font-variant-numeric:tabular-nums;
+  }
+  .clock.on{ color:var(--accent-deep); }
+  .running-task{
+    text-align:center; font-size:13px; font-weight:700; color:var(--text-soft);
+    min-height:20px; margin-bottom:8px;
+  }
+  .running-task .dot{
+    display:inline-block; width:8px; height:8px; border-radius:50%;
+    background:var(--accent); margin-right:6px; animation:pulse 1.2s infinite;
+  }
+  @keyframes pulse{ 0%,100%{opacity:1} 50%{opacity:.25} }
+
+  .btn-row{ display:flex; justify-content:center; padding:4px 0 6px; }
+  .main-btn{
+    width:96px; height:96px; border-radius:50%; border:none; cursor:pointer;
+    font-size:38px; color:#fff; display:flex; align-items:center; justify-content:center;
+    background:linear-gradient(145deg,var(--accent),var(--accent-deep));
+    box-shadow:0 10px 22px rgba(123,136,238,.4);
+    transition:transform .15s;
+  }
+  .main-btn:active{ transform:scale(.92); }
+  .main-btn.stop{
+    background:linear-gradient(145deg,#ffc38a,var(--coral));
+    box-shadow:0 10px 22px rgba(255,157,157,.45);
+    animation:breathe 2s ease-in-out infinite;
+  }
+  @keyframes breathe{ 0%,100%{transform:scale(1)} 50%{transform:scale(1.05)} }
+  .btn-hint{ text-align:center; font-size:12px; color:var(--text-soft); }
+
+  /* ---------- view tabs ---------- */
+  .tabs{
+    display:flex; background:#f1eff7; border-radius:999px; padding:4px; margin-bottom:14px;
+  }
+  .tab{
+    flex:1; border:none; cursor:pointer; font-family:inherit;
+    font-size:13px; font-weight:700; padding:8px 0; border-radius:999px;
+    background:none; color:var(--text-soft); transition:all .15s;
+  }
+  .tab.active{
+    background:#fff; color:var(--accent-deep);
+    box-shadow:0 2px 8px rgba(123,136,238,.2);
+  }
+
+  /* ---------- sessions / timeline ---------- */
+  .day-group{ margin-bottom:14px; }
+  .day-head{
+    display:flex; justify-content:space-between; align-items:center;
+    font-size:13px; font-weight:700; padding:4px 4px 8px;
+  }
+  .day-head .d-total{ color:var(--accent-deep); }
+  .session{
+    display:flex; align-items:center; gap:9px;
+    background:#fcfbff; border:1.5px solid #ece8f5; border-radius:14px;
+    padding:9px 12px; margin-bottom:6px;
+  }
+  .s-time{ font-size:12px; font-weight:900; color:var(--text-soft); white-space:nowrap; font-variant-numeric:tabular-nums; }
+  .s-body{ flex:1; min-width:0; display:flex; align-items:center; gap:6px; }
+  .s-task{ font-size:14px; font-weight:700; white-space:nowrap; }
+  .s-note{ font-size:11px; color:var(--text-soft); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .s-dur{ font-size:13px; font-weight:900; color:var(--accent-deep); white-space:nowrap; }
+  .s-del{
+    border:none; background:none; cursor:pointer; font-size:14px; color:#c9c3d6;
+    padding:4px 6px; border-radius:8px;
+  }
+  .s-del:hover{ color:#e08585; background:#fdeeee; }
+  .view-empty{ text-align:center; font-size:13px; color:var(--text-soft); padding:10px 0; }
+
+  /* ---------- past view ---------- */
+  .range-quick{ display:flex; gap:6px; justify-content:center; margin-bottom:10px; }
+  .q-btn{
+    border:none; font-family:inherit; cursor:pointer;
+    font-size:12px; font-weight:700; padding:7px 16px; border-radius:999px;
+    background:#f4ecff; color:#8a6fc8; transition:transform .12s;
+  }
+  .q-btn:active{ transform:scale(.94); }
+  .q-btn.active{ background:var(--lavender); color:#fff; }
+  .range-inputs{
+    display:flex; gap:6px; align-items:center; justify-content:center;
+    font-size:12px; font-weight:700; color:var(--text-soft); margin-bottom:12px;
+  }
+  .range-inputs input{
+    border:2px solid #f0e6f2; border-radius:10px; padding:6px 8px;
+    font-family:inherit; font-size:12px; font-weight:700; color:var(--text);
+    background:#fcfbff; outline:none; max-width:140px;
+  }
+  .range-inputs input:focus{ border-color:var(--lavender); }
+
+  .range-sum{
+    text-align:center; font-size:26px; font-weight:900; color:var(--accent-deep); margin-bottom:4px;
+  }
+  .range-sum small{ font-size:13px; font-weight:700; }
+  .range-sub{ text-align:center; font-size:11px; color:var(--text-soft); margin-bottom:14px; }
+
+  .donut-wrap{ display:flex; align-items:center; gap:16px; justify-content:center; margin-bottom:16px; }
+  .donut{
+    width:120px; height:120px; border-radius:50%; flex:none; position:relative;
+  }
+  .donut::after{
+    content:''; position:absolute; inset:26px; background:#fff; border-radius:50%;
+  }
+  .legend{ display:flex; flex-direction:column; gap:5px; min-width:0; }
+  .lg-row{ display:flex; align-items:center; gap:6px; font-size:12px; font-weight:700; }
+  .lg-name{ overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:90px; }
+  .lg-val{ color:var(--text-soft); white-space:nowrap; }
+
+  .bars-title{ font-size:11px; font-weight:700; color:var(--text-soft); margin:0 2px 6px; }
+  .bars-scroll{ overflow-x:auto; padding-bottom:4px; }
+  .bars{
+    display:flex; align-items:flex-end; gap:5px; height:130px; padding:0 2px;
+    min-width:100%; width:max-content;
+  }
+  .bar-col{ display:flex; flex-direction:column; align-items:center; gap:3px; width:30px; flex:none; }
+  .bar-val{ font-size:9px; font-weight:700; color:var(--text-soft); white-space:nowrap; }
+  .bar{
+    width:16px; border-radius:6px 6px 3px 3px;
+    background:linear-gradient(180deg,var(--accent),var(--accent-deep));
+    min-height:2px;
+  }
+  .bar.zero{ background:#eeecf5; }
+  .bar-label{ font-size:9px; font-weight:700; color:var(--text-soft); white-space:nowrap; }
+
+  /* ---------- backup ---------- */
+  .export-row{ display:flex; flex-wrap:wrap; gap:8px; justify-content:center; }
+  .pill-btn{
+    border:none; font-family:inherit; cursor:pointer;
+    font-size:13px; font-weight:700; padding:10px 18px; border-radius:999px;
+    background:linear-gradient(90deg,#fff2e6,#e9f2ff,#f0e9ff); color:var(--text);
+    box-shadow:0 3px 10px rgba(137,132,201,.15);
+    transition:transform .12s;
+  }
+  .pill-btn:active{ transform:scale(.95); }
+  .export-note{ text-align:center; font-size:11px; color:var(--text-soft); margin-top:10px; line-height:1.7; }
+
+  footer{ text-align:center; font-size:11px; color:#c3aec7; padding-top:6px; }
+
+  /* ---------- record editor modal ---------- */
+  .modal-bg{
+    position:fixed; inset:0; background:rgba(88,82,110,.38); z-index:60;
+    display:flex; align-items:center; justify-content:center; padding:20px;
+  }
+  .modal-bg[hidden]{ display:none; }
+  .modal{
+    background:#fff; border-radius:22px; padding:20px; width:100%; max-width:340px;
+    box-shadow:0 18px 50px rgba(88,82,110,.3);
+  }
+  .modal-title{ font-size:15px; font-weight:900; text-align:center; margin-bottom:8px; }
+  .m-label{ font-size:11px; font-weight:700; color:var(--text-soft); margin:10px 2px 4px; }
+  .m-input{
+    width:100%; border:2px solid #e9e4f2; border-radius:12px; padding:9px 12px;
+    font-family:inherit; font-size:14px; font-weight:700; color:var(--text);
+    background:#fcfbff; outline:none;
+  }
+  .m-input:focus{ border-color:var(--accent); }
+  .m-row{ display:flex; gap:8px; }
+  .m-row > div{ flex:1; }
+  .m-btns{ display:flex; gap:8px; margin-top:16px; align-items:center; }
+  .m-del{
+    border:none; background:none; cursor:pointer; font-family:inherit;
+    font-size:12px; font-weight:700; color:#e08585; text-decoration:underline; margin-right:auto;
+  }
+  .m-cancel{
+    border:none; cursor:pointer; font-family:inherit;
+    font-size:13px; font-weight:700; padding:10px 16px; border-radius:999px;
+    background:#f1eff7; color:var(--text-soft);
+  }
+  .m-save{
+    border:none; cursor:pointer; font-family:inherit;
+    font-size:13px; font-weight:700; padding:10px 22px; border-radius:999px;
+    background:linear-gradient(145deg,var(--accent),var(--accent-deep)); color:#fff;
+    box-shadow:0 4px 12px rgba(123,136,238,.35);
+  }
+  .add-record-row{ display:flex; justify-content:center; margin-top:10px; }
+
+  /* ---------- praise toast ---------- */
+  .toast{
+    position:fixed; left:50%; top:38%; transform:translate(-50%,-50%) scale(.6);
+    background:#fff; border-radius:24px; padding:22px 30px; text-align:center;
+    box-shadow:0 16px 44px rgba(123,136,238,.35); z-index:50;
+    opacity:0; pointer-events:none; transition:all .3s cubic-bezier(.34,1.56,.64,1);
+  }
+  .toast.show{ opacity:1; transform:translate(-50%,-50%) scale(1); }
+  .toast .t-emoji{ font-size:40px; }
+  .toast .t-msg{ font-size:17px; font-weight:900; color:var(--accent-deep); margin-top:6px; }
+  .toast .t-sub{ font-size:13px; font-weight:700; color:var(--text-soft); margin-top:2px; }
+
+  /* ---------- confetti ---------- */
+  .confetti{
+    position:fixed; top:-4vh; width:10px; height:14px; border-radius:3px;
+    z-index:40; pointer-events:none;
+    animation:fall linear forwards;
+  }
+  @keyframes fall{
+    to{ transform:translateY(115vh) translateX(var(--drift)) rotate(var(--rot)); opacity:.7; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="logo">すたログ</div>
+    <div class="tagline">📚 きょうの勉強、ちゃんと見える化しよ ✏️</div>
+  </header>
+
+  <!-- 今日の合計 -->
+  <section class="card">
+    <div class="card-title">🌟 きょうの勉強時間</div>
+    <div class="today-total" id="todayTotal">0<small>分</small></div>
+    <div class="today-breakdown" id="todayBreakdown"></div>
+    <div class="today-empty" id="todayEmpty">まだ記録がないよ。タイマーをスタートしてみよ!</div>
+  </section>
+
+  <!-- タイマー -->
+  <section class="card">
+    <div class="card-title">⏰ タイマー</div>
+    <div class="sec-label" id="subjectLabel">科目をえらんでね</div>
+    <div class="chips" id="subjectChips"></div>
+    <div class="chip-tools" id="chipTools">
+      <button class="chip-tool" id="addSubject">＋ 科目をふやす</button>
+      <button class="chip-tool" id="editSubjects">科目をへらす</button>
+    </div>
+    <div class="sec-label">メモ(なにをやる? なくてもOK)</div>
+    <input type="text" class="note-input" id="noteInput" maxlength="40"
+           placeholder="例: 青チャート p.34〜、英単語 No.100-150">
+    <div class="clock" id="clock">00:00:00</div>
+    <div class="running-task" id="runningTask"></div>
+    <div class="btn-row">
+      <button class="main-btn" id="mainBtn" aria-label="スタート">▶</button>
+    </div>
+    <div class="btn-hint" id="btnHint">科目をえらんで ▶ でスタート!</div>
+  </section>
+
+  <!-- 記録をみる -->
+  <section class="card">
+    <div class="card-title">📖 記録をみる</div>
+    <div class="tabs">
+      <button class="tab active" id="tabToday">きょう</button>
+      <button class="tab" id="tabPast">過去</button>
+    </div>
+
+    <div id="viewToday">
+      <div id="timeline"></div>
+      <div class="view-empty" id="todayViewEmpty">きょうの記録はまだないよ ☁️<br>ここに時系列で並ぶから、日記や手帳にそのまま書き写せるよ!</div>
+    </div>
+
+    <div id="viewPast" hidden>
+      <div class="range-quick">
+        <button class="q-btn active" data-days="7">7日間</button>
+        <button class="q-btn" data-days="30">30日間</button>
+        <button class="q-btn" data-days="0">ぜんぶ</button>
+      </div>
+      <div class="range-inputs">
+        <input type="date" id="fromDate"> 〜 <input type="date" id="toDate">
+      </div>
+      <div class="range-sum" id="rangeSum">0<small>分</small></div>
+      <div class="range-sub" id="rangeSub"></div>
+      <div class="donut-wrap" id="donutWrap">
+        <div class="donut" id="donut"></div>
+        <div class="legend" id="legend"></div>
+      </div>
+      <div class="bars-title" id="barsTitle">📊 1日ごとの勉強時間</div>
+      <div class="bars-scroll"><div class="bars" id="bars"></div></div>
+      <div style="height:10px"></div>
+      <div id="history"></div>
+      <div class="view-empty" id="pastEmpty">この期間の記録はないよ 🌙</div>
+    </div>
+
+    <div class="add-record-row">
+      <button class="pill-btn" id="addRecord">✍️ 手動で記録をつける</button>
+    </div>
+    <div class="export-note" style="margin-top:6px">記録をタップすると直せるよ</div>
+  </section>
+
+  <!-- バックアップ -->
+  <section class="card">
+    <div class="card-title">💾 バックアップ</div>
+    <div class="export-row">
+      <button class="pill-btn" id="exportJson">💾 バックアップする</button>
+      <button class="pill-btn" id="importBtn">🔁 復元する</button>
+    </div>
+    <input type="file" id="importFile" accept=".json,application/json" hidden>
+    <div class="export-note">
+      記録はこのブラウザの中に約1年間保存されるよ。<br>
+      スマホなら共有シートから「ファイルに保存」でスマホの中に保存できるよ。<br>
+      機種変のときは「バックアップする」→ 新しいスマホで「復元する」だよ!
+    </div>
+  </section>
+
+  <footer>すたログ — study log timer</footer>
+</div>
+
+<!-- 記録エディタ -->
+<div class="modal-bg" id="editorBg" hidden>
+  <div class="modal">
+    <div class="modal-title" id="editorTitle">✍️ 手動で記録をつける</div>
+    <div class="m-label">科目</div>
+    <select class="m-input" id="edSubject"></select>
+    <div class="m-label">メモ(なくてもOK)</div>
+    <input type="text" class="m-input" id="edNote" maxlength="40" placeholder="例: 青チャート p.34〜">
+    <div class="m-label">日付</div>
+    <input type="date" class="m-input" id="edDate">
+    <div class="m-row">
+      <div>
+        <div class="m-label">開始</div>
+        <input type="time" class="m-input" id="edStart">
+      </div>
+      <div>
+        <div class="m-label">終了</div>
+        <input type="time" class="m-input" id="edEnd">
+      </div>
+    </div>
+    <div class="m-btns">
+      <button class="m-del" id="edDelete">この記録をけす</button>
+      <button class="m-cancel" id="edCancel">やめる</button>
+      <button class="m-save" id="edSave">ほぞん</button>
+    </div>
+  </div>
+</div>
+
+<!-- ほめトースト -->
+<div class="toast" id="toast">
+  <div class="t-emoji" id="toastEmoji">🌟</div>
+  <div class="t-msg" id="toastMsg">おつかれさま!</div>
+  <div class="t-sub" id="toastSub"></div>
+</div>
+
+<script>
+(() => {
+  'use strict';
+
+  const STORAGE_KEY = 'stalog.v1';
+  const KEEP_DAYS = 400;          // 履歴の保持期間(約13ヶ月。受験1年分+余裕)
+
+  const PRESET_SUBJECTS = [
+    { name: '国語', color: '#ff9aa2' },
+    { name: '数学', color: '#a5d8ff' },
+    { name: '英語', color: '#c3a6ff' },
+    { name: '理科', color: '#b5e48c' },
+    { name: '社会', color: '#ffd166' }
+  ];
+  const PALETTE = ['#ff9aa2','#a5d8ff','#c3a6ff','#b5e48c','#ffd166','#8ce3d0','#ffab91','#f9c0de','#9fd8df','#d0a9f5'];
+  const FALLBACK_COLOR = '#c9c3d6'; // 削除された科目・旧データ用
+
+  /* ---------- state ---------- */
+  let state = {
+    version: 2,
+    sessions: [],        // {id, taskName(=科目), note, start(ISO), end(ISO), ms}
+    running: null,       // {taskName, note, startedAt(epoch ms)}
+    subjects: null,      // [{name, color}]
+    selectedSubject: null
+  };
+
+  function nextColor() {
+    return PALETTE[state.subjects.length % PALETTE.length];
+  }
+
+  function load() {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (raw) {
+        const data = JSON.parse(raw);
+        if (data && Array.isArray(data.sessions)) state = Object.assign(state, data);
+      }
+    } catch (e) { /* 壊れたデータは初期化 */ }
+
+    // v1 → v2 マイグレーション: 科目リストを用意し、旧「最近のタスク」を科目に変換
+    if (!Array.isArray(state.subjects)) {
+      state.subjects = PRESET_SUBJECTS.map(s => ({ ...s }));
+      if (Array.isArray(state.recentTasks)) {
+        state.recentTasks.forEach(name => {
+          if (!state.subjects.some(s => s.name === name)) {
+            state.subjects.push({ name, color: nextColor() });
+          }
+        });
+      }
+    }
+    delete state.recentTasks;
+    state.version = 2;
+
+    const limit = Date.now() - KEEP_DAYS * 24 * 60 * 60 * 1000;
+    state.sessions = state.sessions.filter(s => new Date(s.end).getTime() >= limit);
+  }
+
+  function save() {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    } catch (e) { /* 容量オーバー等は黙って継続 */ }
+  }
+
+  function subjectColor(name) {
+    const s = state.subjects.find(x => x.name === name);
+    return s ? s.color : FALLBACK_COLOR;
+  }
+
+  /* ---------- time utils ---------- */
+  const pad = n => String(n).padStart(2, '0');
+  const DAY = 864e5;
+
+  function formatClock(ms) {
+    const sec = Math.floor(ms / 1000);
+    return pad(Math.floor(sec / 3600)) + ':' + pad(Math.floor(sec / 60) % 60) + ':' + pad(sec % 60);
+  }
+
+  function formatDur(ms) {
+    const min = Math.floor(ms / 60000);
+    if (min >= 60) {
+      const m = min % 60;
+      return Math.floor(min / 60) + '時間' + (m ? m + '分' : '');
+    }
+    if (min >= 1) return min + '分';
+    return Math.max(1, Math.floor(ms / 1000)) + '秒';
+  }
+
+  function dateKey(d) {
+    return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate());
+  }
+
+  function keyToDate(key) {
+    const [y, m, d] = key.split('-').map(Number);
+    return new Date(y, m - 1, d);
+  }
+
+  function dateLabel(key) {
+    const today = dateKey(new Date());
+    const yest = dateKey(new Date(Date.now() - DAY));
+    const d = keyToDate(key);
+    const week = ['日','月','火','水','木','金','土'][d.getDay()];
+    if (key === today) return 'きょう 🌟';
+    if (key === yest) return 'きのう';
+    return (d.getMonth() + 1) + '/' + d.getDate() + ' (' + week + ')';
+  }
+
+  /* ---------- dom ---------- */
+  const $ = id => document.getElementById(id);
+  const mainBtn = $('mainBtn'), clock = $('clock'), noteInput = $('noteInput');
+  let editMode = false;       // 科目の削除モード
+  let currentTab = 'today';
+  let rangeFrom = null, rangeTo = null;  // dateKey文字列
+
+  function esc(s) {
+    return String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  }
+
+  /* ---------- timer ---------- */
+  function startTimer() {
+    if (!state.selectedSubject || !state.subjects.some(s => s.name === state.selectedSubject)) {
+      const chips = $('subjectChips');
+      chips.classList.remove('shake');
+      void chips.offsetWidth;
+      chips.classList.add('shake');
+      $('btnHint').textContent = 'まずは科目をえらんでね!';
+      return;
+    }
+    state.running = {
+      taskName: state.selectedSubject,
+      note: noteInput.value.trim(),
+      startedAt: Date.now()
+    };
+    save();
+    render();
+  }
+
+  function stopTimer() {
+    if (!state.running) return;
+    const now = Date.now();
+    const ms = now - state.running.startedAt;
+    if (ms >= 1000) {
+      state.sessions.push({
+        id: 's_' + now.toString(36) + Math.random().toString(36).slice(2, 6),
+        taskName: state.running.taskName,
+        note: state.running.note || '',
+        start: new Date(state.running.startedAt).toISOString(),
+        end: new Date(now).toISOString(),
+        ms: ms
+      });
+      praise(state.running.taskName, ms);
+    }
+    state.running = null;
+    noteInput.value = '';
+    save();
+    render();
+  }
+
+  function deleteSession(id) {
+    if (!confirm('この記録を削除する?')) return;
+    state.sessions = state.sessions.filter(s => s.id !== id);
+    save();
+    render();
+  }
+
+  /* ---------- subjects ---------- */
+  $('addSubject').onclick = () => {
+    const name = (prompt('新しい科目の名前は?(例: 簿記、プログラミング)') || '').trim();
+    if (!name) return;
+    if (name.length > 10) { alert('科目名は10文字までにしてね!'); return; }
+    if (state.subjects.some(s => s.name === name)) { alert('その科目はもうあるよ!'); return; }
+    state.subjects.push({ name, color: nextColor() });
+    state.selectedSubject = name;
+    save();
+    render();
+  };
+
+  $('editSubjects').onclick = () => {
+    editMode = !editMode;
+    render();
+  };
+
+  function deleteSubject(name) {
+    if (state.subjects.length <= 1) { alert('科目はさいてい1つは必要だよ!'); return; }
+    if (!confirm('科目「' + name + '」をけす?(過去の記録はそのまま残るよ)')) return;
+    state.subjects = state.subjects.filter(s => s.name !== name);
+    if (state.selectedSubject === name) state.selectedSubject = null;
+    save();
+    render();
+  }
+
+  /* ---------- praise ---------- */
+  const PRAISES = [
+    ['🌟', 'おつかれさま!'],
+    ['✨', 'えらい!'],
+    ['🐻', 'がんばったね!'],
+    ['🌈', 'よくできました!'],
+    ['🐧', 'ナイス集中!'],
+    ['🍙', 'コツコツ最高!'],
+    ['☀️', 'きょうもかがやいてる!'],
+    ['🦉', '集中モードすごい!']
+  ];
+
+  function praise(name, ms) {
+    const [emoji, msg] = PRAISES[Math.floor(Math.random() * PRAISES.length)];
+    $('toastEmoji').textContent = emoji;
+    $('toastMsg').textContent = msg;
+    $('toastSub').textContent = name + ' +' + formatDur(ms);
+    const toast = $('toast');
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 2600);
+    confetti();
+  }
+
+  function confetti() {
+    const colors = ['#ffb3a7', '#ffd166', '#b5e48c', '#8ec9ff', '#c3a6ff', '#8ce3d0'];
+    for (let i = 0; i < 36; i++) {
+      const p = document.createElement('div');
+      p.className = 'confetti';
+      p.style.left = Math.random() * 100 + 'vw';
+      p.style.background = colors[i % colors.length];
+      p.style.animationDelay = Math.random() * 0.4 + 's';
+      p.style.animationDuration = 1.6 + Math.random() * 1.2 + 's';
+      p.style.setProperty('--rot', Math.random() * 720 - 360 + 'deg');
+      p.style.setProperty('--drift', Math.random() * 120 - 60 + 'px');
+      document.body.appendChild(p);
+      setTimeout(() => p.remove(), 3400);
+    }
+  }
+
+  /* ---------- render ---------- */
+  function render() {
+    const running = state.running;
+
+    mainBtn.textContent = running ? '⏹' : '▶';
+    mainBtn.classList.toggle('stop', !!running);
+    mainBtn.setAttribute('aria-label', running ? 'ストップ' : 'スタート');
+    clock.classList.toggle('on', !!running);
+    noteInput.disabled = !!running;
+    if (running) noteInput.value = running.note;
+    $('runningTask').innerHTML = running
+      ? '<span class="dot"></span>「' + esc(running.taskName) + (running.note ? ' / ' + esc(running.note) : '') + '」を勉強中…'
+      : '';
+    $('btnHint').textContent = running ? '⏹ を押すと記録されるよ' : '科目をえらんで ▶ でスタート!';
+    $('chipTools').style.display = running ? 'none' : '';
+
+    renderSubjects();
+    renderTodayCard();
+    renderView();
+    tick();
+  }
+
+  function renderSubjects() {
+    const box = $('subjectChips');
+    box.innerHTML = '';
+    $('editSubjects').textContent = editMode ? 'おわる' : '科目をへらす';
+    state.subjects.forEach(sub => {
+      const b = document.createElement('button');
+      b.className = 'chip' + (state.selectedSubject === sub.name && !editMode ? ' selected' : '');
+      b.style.background = sub.color + '55';
+      b.disabled = !!state.running;
+      const dot = document.createElement('span');
+      dot.className = 'subj-dot';
+      dot.style.background = sub.color;
+      b.appendChild(dot);
+      b.appendChild(document.createTextNode(sub.name));
+      if (editMode) {
+        const x = document.createElement('span');
+        x.className = 'x';
+        x.textContent = '✕';
+        b.appendChild(x);
+        b.onclick = () => deleteSubject(sub.name);
+      } else {
+        b.onclick = () => {
+          state.selectedSubject = sub.name;
+          save();
+          renderSubjects();
+        };
+      }
+      box.appendChild(b);
+    });
+  }
+
+  function todaySessions() {
+    const today = dateKey(new Date());
+    return state.sessions.filter(s => dateKey(new Date(s.end)) === today);
+  }
+
+  function renderTodayCard() {
+    const list = todaySessions();
+    let total = list.reduce((a, s) => a + s.ms, 0);
+    if (state.running) total += Date.now() - state.running.startedAt;
+
+    const min = Math.floor(total / 60000);
+    $('todayTotal').innerHTML = min >= 60
+      ? Math.floor(min / 60) + '<small>時間</small>' + (min % 60) + '<small>分</small>'
+      : min + '<small>分</small>';
+
+    const bySubj = {};
+    list.forEach(s => { bySubj[s.taskName] = (bySubj[s.taskName] || 0) + s.ms; });
+    if (state.running) {
+      bySubj[state.running.taskName] = (bySubj[state.running.taskName] || 0) + (Date.now() - state.running.startedAt);
+    }
+    const bd = $('todayBreakdown');
+    bd.innerHTML = '';
+    Object.entries(bySubj).sort((a, b) => b[1] - a[1]).forEach(([name, ms]) => {
+      const c = document.createElement('span');
+      c.className = 'bd-chip';
+      c.innerHTML = '<span class="subj-dot" style="background:' + subjectColor(name) + '"></span>'
+        + esc(name) + '<b>' + formatDur(ms) + '</b>';
+      bd.appendChild(c);
+    });
+    $('todayEmpty').style.display = (list.length || state.running) ? 'none' : '';
+  }
+
+  /* ---------- view: tabs ---------- */
+  $('tabToday').onclick = () => { currentTab = 'today'; renderView(); };
+  $('tabPast').onclick = () => { currentTab = 'past'; renderView(); };
+
+  function renderView() {
+    $('tabToday').classList.toggle('active', currentTab === 'today');
+    $('tabPast').classList.toggle('active', currentTab === 'past');
+    $('viewToday').hidden = currentTab !== 'today';
+    $('viewPast').hidden = currentTab !== 'past';
+    if (currentTab === 'today') renderTimeline();
+    else renderPast();
+  }
+
+  function sessionRow(s, showDelete) {
+    const st = new Date(s.start), en = new Date(s.end);
+    const row = document.createElement('div');
+    row.className = 'session';
+    row.style.cursor = 'pointer';
+    row.onclick = () => openEditor(s.id);
+    row.innerHTML =
+      '<span class="s-time">' + pad(st.getHours()) + ':' + pad(st.getMinutes()) +
+      '<br>' + pad(en.getHours()) + ':' + pad(en.getMinutes()) + '</span>' +
+      '<div class="s-body"><span class="subj-dot" style="background:' + subjectColor(s.taskName) + '"></span>' +
+      '<span class="s-task">' + esc(s.taskName) + '</span>' +
+      (s.note ? '<span class="s-note">' + esc(s.note) + '</span>' : '') +
+      '</div><span class="s-dur">' + formatDur(s.ms) + '</span>';
+    if (showDelete) {
+      const del = document.createElement('button');
+      del.className = 's-del';
+      del.textContent = '✕';
+      del.setAttribute('aria-label', '削除');
+      del.onclick = e => { e.stopPropagation(); deleteSession(s.id); };
+      row.appendChild(del);
+    }
+    return row;
+  }
+
+  /* ---------- view: きょう(時系列) ---------- */
+  function renderTimeline() {
+    const box = $('timeline');
+    box.innerHTML = '';
+    const list = todaySessions().slice().sort((a, b) => a.start.localeCompare(b.start));
+    list.forEach(s => box.appendChild(sessionRow(s, true)));
+
+    if (state.running) {
+      const st = new Date(state.running.startedAt);
+      const row = document.createElement('div');
+      row.className = 'session';
+      row.style.borderColor = '#e8d9ff';
+      row.innerHTML =
+        '<span class="s-time">' + pad(st.getHours()) + ':' + pad(st.getMinutes()) + '<br>…</span>' +
+        '<div class="s-body"><span class="subj-dot" style="background:' + subjectColor(state.running.taskName) + '"></span>' +
+        '<span class="s-task">' + esc(state.running.taskName) + '</span>' +
+        (state.running.note ? '<span class="s-note">' + esc(state.running.note) + '</span>' : '') +
+        '<span class="dot" style="display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--accent);animation:pulse 1.2s infinite"></span>' +
+        '</div><span class="s-dur">' + formatDur(Date.now() - state.running.startedAt) + '</span>';
+      box.appendChild(row);
+    }
+    $('todayViewEmpty').style.display = (list.length || state.running) ? 'none' : '';
+  }
+
+  /* ---------- view: 過去 ---------- */
+  function initRange(days) {
+    const today = new Date();
+    if (days === 0) {
+      // ぜんぶ: いちばん古い記録から今日まで
+      const oldest = state.sessions.reduce((a, s) => {
+        const t = new Date(s.end).getTime();
+        return t < a ? t : a;
+      }, Date.now());
+      rangeFrom = dateKey(new Date(oldest));
+    } else {
+      rangeFrom = dateKey(new Date(today.getTime() - (days - 1) * DAY));
+    }
+    rangeTo = dateKey(today);
+    $('fromDate').value = rangeFrom;
+    $('toDate').value = rangeTo;
+  }
+
+  document.querySelectorAll('.q-btn').forEach(btn => {
+    btn.onclick = () => {
+      document.querySelectorAll('.q-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      initRange(Number(btn.dataset.days));
+      renderPast();
+    };
+  });
+
+  $('fromDate').onchange = $('toDate').onchange = () => {
+    document.querySelectorAll('.q-btn').forEach(b => b.classList.remove('active'));
+    rangeFrom = $('fromDate').value || rangeFrom;
+    rangeTo = $('toDate').value || rangeTo;
+    if (rangeFrom > rangeTo) { const t = rangeFrom; rangeFrom = rangeTo; rangeTo = t;
+      $('fromDate').value = rangeFrom; $('toDate').value = rangeTo; }
+    renderPast();
+  };
+
+  function rangeSessions() {
+    return state.sessions.filter(s => {
+      const k = dateKey(new Date(s.end));
+      return k >= rangeFrom && k <= rangeTo;
+    });
+  }
+
+  function renderPast() {
+    if (!rangeFrom) initRange(7);
+    const list = rangeSessions();
+    const total = list.reduce((a, s) => a + s.ms, 0);
+
+    // 合計時間(時間換算つき)
+    const min = Math.floor(total / 60000);
+    $('rangeSum').innerHTML = min >= 60
+      ? Math.floor(min / 60) + '<small>時間</small>' + (min % 60) + '<small>分</small>'
+      : min + '<small>分</small>';
+    const days = Math.round((keyToDate(rangeTo) - keyToDate(rangeFrom)) / DAY) + 1;
+    $('rangeSub').textContent = days + '日間の合計 / 1日へいきん ' + formatDur(total / days);
+
+    renderDonut(list, total);
+    renderBars(days);
+    renderHistory(list);
+
+    $('pastEmpty').style.display = list.length ? 'none' : '';
+    $('donutWrap').style.display = list.length ? '' : 'none';
+    document.querySelector('.bars-scroll').style.display = list.length ? '' : 'none';
+    $('barsTitle').style.display = list.length ? '' : 'none';
+  }
+
+  function renderDonut(list, total) {
+    const bySubj = {};
+    list.forEach(s => { bySubj[s.taskName] = (bySubj[s.taskName] || 0) + s.ms; });
+    const entries = Object.entries(bySubj).sort((a, b) => b[1] - a[1]);
+
+    // conic-gradient で科目割合ドーナツ
+    let acc = 0;
+    const stops = entries.map(([name, ms]) => {
+      const from = acc / total * 360;
+      acc += ms;
+      const to = acc / total * 360;
+      return subjectColor(name) + ' ' + from + 'deg ' + to + 'deg';
+    });
+    $('donut').style.background = 'conic-gradient(' + stops.join(',') + ')';
+
+    const lg = $('legend');
+    lg.innerHTML = '';
+    entries.forEach(([name, ms]) => {
+      const row = document.createElement('div');
+      row.className = 'lg-row';
+      row.innerHTML = '<span class="subj-dot" style="background:' + subjectColor(name) + '"></span>' +
+        '<span class="lg-name">' + esc(name) + '</span>' +
+        '<span class="lg-val">' + formatDur(ms) + ' (' + Math.round(ms / total * 100) + '%)</span>';
+      lg.appendChild(row);
+    });
+  }
+
+  function renderBars(days) {
+    const box = $('bars');
+    box.innerHTML = '';
+    const weekly = days > 62;   // 期間が長いときは週ごとに集計
+    $('barsTitle').textContent = weekly ? '📊 1週間ごとの勉強時間' : '📊 1日ごとの勉強時間';
+
+    // バケツを作る
+    const buckets = [];   // {label, from(dateKey), to(dateKey), ms}
+    const start = keyToDate(rangeFrom), end = keyToDate(rangeTo);
+    if (weekly) {
+      let cur = new Date(start);
+      cur.setDate(cur.getDate() - (cur.getDay() + 6) % 7);   // 週の頭(月曜)にそろえる
+      while (cur <= end) {
+        const wEnd = new Date(cur.getTime() + 6 * DAY);
+        buckets.push({
+          label: (cur.getMonth() + 1) + '/' + cur.getDate(),
+          from: dateKey(cur), to: dateKey(wEnd), ms: 0
+        });
+        cur = new Date(cur.getTime() + 7 * DAY);
+      }
+    } else {
+      for (let t = start.getTime(); t <= end.getTime(); t += DAY) {
+        const d = new Date(t);
+        buckets.push({
+          label: (d.getMonth() + 1) + '/' + d.getDate(),
+          from: dateKey(d), to: dateKey(d), ms: 0
+        });
+      }
+    }
+    rangeSessions().forEach(s => {
+      const k = dateKey(new Date(s.end));
+      const b = buckets.find(b => k >= b.from && k <= b.to);
+      if (b) b.ms += s.ms;
+    });
+
+    const max = Math.max(...buckets.map(b => b.ms), 1);
+    buckets.forEach(b => {
+      const col = document.createElement('div');
+      col.className = 'bar-col';
+      const h = Math.round(b.ms / max * 96);
+      const hours = b.ms >= 3600000
+        ? (Math.round(b.ms / 360000) / 10) + 'h'
+        : (b.ms > 0 ? Math.max(1, Math.floor(b.ms / 60000)) + 'm' : '');
+      col.innerHTML =
+        '<span class="bar-val">' + hours + '</span>' +
+        '<div class="bar' + (b.ms ? '' : ' zero') + '" style="height:' + Math.max(h, 2) + 'px"></div>' +
+        '<span class="bar-label">' + b.label + '</span>';
+      box.appendChild(col);
+    });
+    // 直近(右端)を見せる
+    requestAnimationFrame(() => {
+      const sc = document.querySelector('.bars-scroll');
+      sc.scrollLeft = sc.scrollWidth;
+    });
+  }
+
+  function renderHistory(list) {
+    const box = $('history');
+    box.innerHTML = '';
+    const groups = {};
+    list.forEach(s => {
+      const k = dateKey(new Date(s.end));
+      (groups[k] = groups[k] || []).push(s);
+    });
+    Object.keys(groups).sort().reverse().forEach(k => {
+      const dayList = groups[k].slice().sort((a, b) => b.end.localeCompare(a.end));
+      const total = dayList.reduce((a, s) => a + s.ms, 0);
+      const g = document.createElement('div');
+      g.className = 'day-group';
+      const head = document.createElement('div');
+      head.className = 'day-head';
+      head.innerHTML = '<span>' + dateLabel(k) + '</span><span class="d-total">' + formatDur(total) + '</span>';
+      g.appendChild(head);
+      dayList.forEach(s => g.appendChild(sessionRow(s, true)));
+      box.appendChild(g);
+    });
+  }
+
+  /* ---------- record editor(手動記録・修正) ---------- */
+  let editingId = null;      // null = 新規
+  let editorOrig = null;     // 秒を保持するための元の開始/終了
+
+  function hm(d) { return pad(d.getHours()) + ':' + pad(d.getMinutes()); }
+
+  function openEditor(id) {
+    editingId = id;
+    const s = id ? state.sessions.find(x => x.id === id) : null;
+    if (id && !s) return;
+
+    // 科目の選択肢(削除済み科目の記録は、その名前も選べるようにする)
+    const sel = $('edSubject');
+    sel.innerHTML = '';
+    const names = state.subjects.map(x => x.name);
+    if (s && !names.includes(s.taskName)) names.unshift(s.taskName);
+    names.forEach(n => {
+      const o = document.createElement('option');
+      o.value = o.textContent = n;
+      sel.appendChild(o);
+    });
+    sel.value = s ? s.taskName
+      : (state.selectedSubject && names.includes(state.selectedSubject) ? state.selectedSubject : names[0]);
+
+    const st = s ? new Date(s.start) : new Date(Date.now() - 3600000);
+    const en = s ? new Date(s.end) : new Date();
+    editorOrig = s ? { start: st, end: en } : null;
+    $('edNote').value = s ? (s.note || '') : '';
+    $('edDate').value = dateKey(st);
+    $('edStart').value = hm(st);
+    $('edEnd').value = hm(en);
+    $('edDelete').style.display = s ? '' : 'none';
+    $('editorTitle').textContent = s ? '✏️ 記録を直す' : '✍️ 手動で記録をつける';
+    $('editorBg').hidden = false;
+  }
+
+  function closeEditor() {
+    $('editorBg').hidden = true;
+    editingId = null;
+    editorOrig = null;
+  }
+
+  $('addRecord').onclick = () => openEditor(null);
+  $('edCancel').onclick = closeEditor;
+  $('editorBg').onclick = e => { if (e.target === $('editorBg')) closeEditor(); };
+  $('edDelete').onclick = () => {
+    const id = editingId;
+    closeEditor();
+    deleteSession(id);
+  };
+
+  $('edSave').onclick = () => {
+    const dateV = $('edDate').value, sv = $('edStart').value, ev = $('edEnd').value;
+    if (!dateV || !sv || !ev) { alert('日付と時間を入れてね!'); return; }
+    const [y, m, d] = dateV.split('-').map(Number);
+    // 時刻(HH:MM)が変わっていなければ、元の記録の秒を保つ
+    const mk = (v, orig) => {
+      const [h, mi] = v.split(':').map(Number);
+      const sec = orig && hm(orig) === v ? orig.getSeconds() : 0;
+      return new Date(y, m - 1, d, h, mi, sec);
+    };
+    const start = mk(sv, editorOrig && editorOrig.start);
+    let end = mk(ev, editorOrig && editorOrig.end);
+    if (end <= start) {
+      // 深夜またぎ(例: 23:50〜0:10)は翌日あつかいにする
+      if (!confirm('終了が開始より前だよ。よるをまたいだ記録(よく日の ' + ev + ' まで)にする?')) return;
+      end = new Date(end.getTime() + DAY);
+    }
+    // ほかの記録との時間の重複はOK(チェックしない)
+    const rec = {
+      taskName: $('edSubject').value,
+      note: $('edNote').value.trim(),
+      start: start.toISOString(),
+      end: end.toISOString(),
+      ms: end - start
+    };
+    if (editingId) {
+      Object.assign(state.sessions.find(x => x.id === editingId), rec);
+    } else {
+      state.sessions.push(Object.assign({
+        id: 's_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6)
+      }, rec));
+    }
+    save();
+    closeEditor();
+    render();
+  };
+
+  /* ---------- tick ---------- */
+  function tick() {
+    clock.textContent = state.running ? formatClock(Date.now() - state.running.startedAt) : '00:00:00';
+  }
+
+  setInterval(() => {
+    if (state.running) {
+      tick();
+      renderTodayCard();
+      if (currentTab === 'today') renderTimeline();
+    }
+  }, 700);
+
+  /* ---------- backup ---------- */
+  // スマホでは共有シート(ファイルに保存/LINE/Drive等)を開き、
+  // 非対応環境では通常のダウンロードにフォールバックする
+  async function saveFile(filename, content, mime) {
+    const blob = new Blob([content], { type: mime });
+    if (navigator.canShare && typeof File === 'function') {
+      const file = new File([blob], filename, { type: mime });
+      if (navigator.canShare({ files: [file] })) {
+        try {
+          await navigator.share({ files: [file], title: filename });
+          return;
+        } catch (e) {
+          if (e.name === 'AbortError') return; // ユーザーがキャンセル
+          /* 共有失敗時はダウンロードへ */
+        }
+      }
+    }
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = filename;
+    a.click();
+    setTimeout(() => URL.revokeObjectURL(a.href), 5000);
+  }
+
+  function stamp() {
+    const d = new Date();
+    return d.getFullYear() + pad(d.getMonth() + 1) + pad(d.getDate());
+  }
+
+  $('exportJson').onclick = () => {
+    saveFile('sutalog_backup_' + stamp() + '.json',
+      JSON.stringify({
+        exportedAt: new Date().toISOString(),
+        subjects: state.subjects,
+        sessions: state.sessions
+      }, null, 2),
+      'application/json');
+  };
+
+  /* ---------- restore(復元) ---------- */
+  $('importBtn').onclick = () => $('importFile').click();
+
+  $('importFile').addEventListener('change', e => {
+    const file = e.target.files[0];
+    e.target.value = '';
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      let data;
+      try { data = JSON.parse(reader.result); } catch (err) { data = null; }
+      const list = data ? (Array.isArray(data) ? data : data.sessions) : null;
+      if (!Array.isArray(list)) {
+        alert('このファイルは読み込めなかった…。「バックアップする」で保存したファイルを選んでね。');
+        return;
+      }
+      const valid = list.filter(s =>
+        s && typeof s.taskName === 'string' && s.start && s.end && typeof s.ms === 'number');
+      if (!valid.length) {
+        alert('記録が見つからなかったよ。');
+        return;
+      }
+      if (!confirm(valid.length + '件の記録を読み込む?(今ある記録とあわせて保存されるよ)')) return;
+      const ids = new Set(state.sessions.map(s => s.id));
+      let added = 0;
+      valid.forEach(s => {
+        if (!ids.has(s.id)) { state.sessions.push(s); ids.add(s.id); added++; }
+      });
+      // 科目リストも取り込む(同名はスキップ)
+      if (data && Array.isArray(data.subjects)) {
+        data.subjects.forEach(sub => {
+          if (sub && sub.name && !state.subjects.some(x => x.name === sub.name)) {
+            state.subjects.push({ name: sub.name, color: sub.color || nextColor() });
+          }
+        });
+      }
+      const limit = Date.now() - KEEP_DAYS * 24 * 60 * 60 * 1000;
+      state.sessions = state.sessions.filter(s => new Date(s.end).getTime() >= limit);
+      save();
+      render();
+      alert(added + '件を復元したよ!🌟');
+    };
+    reader.readAsText(file);
+  });
+
+  /* ---------- events ---------- */
+  mainBtn.onclick = () => state.running ? stopTimer() : startTimer();
+  noteInput.addEventListener('keydown', e => {
+    if (e.key === 'Enter' && !state.running) startTimer();
+  });
+
+  /* ---------- init ---------- */
+  load();
+  save();
+  initRange(7);
+  render();
+
+  /* ---------- PWA(ホーム画面アプリ・オフライン対応) ---------- */
+  if ('serviceWorker' in navigator &&
+      (location.protocol === 'https:' || ['localhost', '127.0.0.1'].includes(location.hostname))) {
+    navigator.serviceWorker.register('./sw.js').catch(() => { /* iframe埋め込み等では失敗してOK */ });
+  }
+})();
+</script>
+</body>
+</html>
