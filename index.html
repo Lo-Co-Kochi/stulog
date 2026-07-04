@@ -249,6 +249,7 @@
   .export-note{ text-align:center; font-size:11px; color:var(--text-soft); margin-top:10px; line-height:1.7; }
 
   footer{ text-align:center; font-size:11px; color:#c3aec7; padding-top:6px; }
+  footer a{ color:var(--accent-deep); font-weight:700; }
 
   /* ---------- settings toggle ---------- */
   .toggle-row{
@@ -434,7 +435,7 @@
     </label>
   </section>
 
-  <footer>すたログ — study log timer</footer>
+  <footer><a href="guide.html">📖 つかいかたを見る</a><br>すたログ — study log timer</footer>
 </div>
 
 <!-- 記録エディタ -->
@@ -488,9 +489,12 @@
   ];
   const PALETTE = ['#ff9aa2','#a5d8ff','#c3a6ff','#b5e48c','#ffd166','#8ce3d0','#ffab91','#f9c0de','#9fd8df','#d0a9f5'];
   const FALLBACK_COLOR = '#c9c3d6'; // 削除された科目・旧データ用
-  // ユニバーサルカラー(Okabe-Ito パレット): 色覚タイプによらず見分けやすい配色。
-  // 並び順はプリセット科目(国数英理社)が日本の教科イメージに近くなるように調整
-  const CUD_PALETTE = ['#d55e00','#0072b2','#cc79a7','#009e73','#e69f00','#56b4e9','#f0e442','#999999'];
+  // ユニバーサルカラー: 東京都カラーユニバーサルデザインガイドライン掲載の
+  // 「CUD推奨配色セット」(東京大学 伊藤啓准教授)のアクセントカラーに準拠。
+  // 黄色はガイドラインの注意(白背景と見分けにくい)に従い除外。
+  // 並び順はプリセット科目が 国語=赤/数学=青/英語=紫/理科=緑/社会=オレンジ になるよう調整
+  const CUD_PALETTE = ['#ff2800','#0041ff','#9a0079','#35a16b','#ff9900','#66ccff','#ff99a0','#663300'];
+  const CUD_FALLBACK = '#7f878f'; // 同セットの無彩色「グレー」
 
   /* ---------- state ---------- */
   let state = {
@@ -541,7 +545,7 @@
 
   function subjectColor(name) {
     const i = state.subjects.findIndex(x => x.name === name);
-    if (i === -1) return FALLBACK_COLOR;
+    if (i === -1) return state.cud ? CUD_FALLBACK : FALLBACK_COLOR;
     return state.cud ? CUD_PALETTE[i % CUD_PALETTE.length] : state.subjects[i].color;
   }
 

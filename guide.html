@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>すたログのつかいかた 📚</title>
+<meta name="description" content="勉強きろくタイマー「すたログ」の使い方ガイド。タイマーのつけかた、記録の直しかた、ホーム画面へのアプリ追加、バックアップ方法まで。">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📚</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@500;700;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --accent: #8fb7f2;
+    --accent-deep: #7b88ee;
+    --text: #4e4a5e;
+    --text-soft: #948da0;
+    --radius: 22px;
+    --shadow: 0 8px 24px rgba(137, 132, 201, .16);
+  }
+  *{ margin:0; padding:0; box-sizing:border-box; }
+  body{
+    font-family:'Zen Maru Gothic','Hiragino Maru Gothic ProN','Yu Gothic UI',sans-serif;
+    font-weight:500; color:var(--text); line-height:1.9;
+    background:linear-gradient(165deg,#ffeae1 0%,#fff7d9 25%,#e6f7e7 50%,#e0f0ff 75%,#f0e5ff 100%);
+    background-attachment:fixed;
+    min-height:100vh; padding:18px 14px 40px;
+  }
+  .wrap{ max-width:560px; margin:0 auto; display:flex; flex-direction:column; gap:16px; }
+
+  header{ text-align:center; padding:6px 0 2px; }
+  header img{ width:96px; height:96px; border-radius:24px; box-shadow:var(--shadow); }
+  .logo{
+    font-size:30px; font-weight:900; letter-spacing:.04em; margin-top:8px;
+    background:linear-gradient(90deg,#ff9d76,#eabb45,#6bbf74,#5fa8ee,#a58cf2);
+    -webkit-background-clip:text; background-clip:text; color:transparent;
+    display:inline-block;
+  }
+  .tagline{ font-size:13px; color:var(--text-soft); }
+
+  .card{ background:#fff; border-radius:var(--radius); box-shadow:var(--shadow); padding:20px 22px; }
+  h2{
+    font-size:16px; font-weight:900; margin-bottom:8px;
+    display:flex; align-items:center; gap:8px;
+  }
+  p, li{ font-size:14px; }
+  ol, ul{ padding-left:22px; }
+  li{ margin:4px 0; }
+  .note{
+    font-size:12px; color:var(--text-soft); background:#f7f5fc;
+    border-radius:12px; padding:10px 14px; margin-top:10px;
+  }
+  b{ color:var(--accent-deep); }
+  .kbd{
+    display:inline-block; background:#eef2fd; border-radius:8px;
+    padding:0 8px; font-weight:700; font-size:13px;
+  }
+
+  .cta{ text-align:center; padding:8px 0; }
+  .cta a{
+    display:inline-block; text-decoration:none; color:#fff;
+    font-size:16px; font-weight:900; padding:14px 38px; border-radius:999px;
+    background:linear-gradient(145deg,var(--accent),var(--accent-deep));
+    box-shadow:0 8px 20px rgba(123,136,238,.4);
+  }
+  footer{ text-align:center; font-size:11px; color:#b3aabf; padding-top:6px; }
+  footer a{ color:var(--accent-deep); }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <img src="icon-192.png" alt="すたログのアイコン(にじとにこにこ星)">
+    <div><span class="logo">すたログのつかいかた</span></div>
+    <div class="tagline">科目をえらんで ▶ を押すだけ。勉強きろくタイマー</div>
+  </header>
+
+  <div class="cta"><a href="./">📚 すたログをひらく</a></div>
+
+  <section class="card">
+    <h2>🌟 すたログとは</h2>
+    <p>勉強した時間を、科目ごとに記録できる無料のタイマーです。会員登録もログインも不要で、開いたらすぐ使えます。記録した時間は自動でグラフになるので、がんばりが目に見えます。</p>
+    <div class="note">記録はぜんぶ<b>あなたのスマホ(ブラウザ)の中だけ</b>に保存されます。サーバーには何も送信されないので、勉強の記録がだれかに見られることはありません。</div>
+  </section>
+
+  <section class="card">
+    <h2>⏰ きほんの使い方</h2>
+    <ol>
+      <li><b>科目をえらぶ</b> — 国語・数学・英語・理科・社会から、いまから勉強する科目をタップ</li>
+      <li><b>メモを書く</b>(なくてもOK)— 「青チャート p.34〜」みたいに、何をやるか書いておくと、あとで見返すときに便利</li>
+      <li><span class="kbd">▶</span> を押して勉強スタート!</li>
+      <li>終わったら <span class="kbd">⏹</span> を押す — 記録が保存されて、おつかれさまの演出が出ます 🎉</li>
+    </ol>
+    <div class="note">タイマー中にアプリを閉じたり画面を更新しても、計測はちゃんと続いています。</div>
+  </section>
+
+  <section class="card">
+    <h2>➕ 科目をカスタマイズ</h2>
+    <ul>
+      <li><b>＋ 科目をふやす</b> — 簿記、プログラミング、ピアノなど、自分だけの科目を追加できます(色も自動でつきます)</li>
+      <li><b>科目をへらす</b> — 使わない科目を削除できます。過去の記録は消えないので安心</li>
+    </ul>
+  </section>
+
+  <section class="card">
+    <h2>📖 記録を見る</h2>
+    <ul>
+      <li><b>「きょう」タブ</b> — 今日の勉強が時系列で並びます。勉強手帳や日記に書き写すのにぴったり</li>
+      <li><b>「過去」タブ</b> — 7日間・30日間・ぜんぶ、または日付を指定して、合計時間・1日平均・科目の割合グラフ・日ごとの棒グラフが見られます</li>
+    </ul>
+  </section>
+
+  <section class="card">
+    <h2>✍️ 記録をあとからつける・直す</h2>
+    <ul>
+      <li><b>✍️ 手動で記録をつける</b> — タイマーをつけ忘れた勉強も、日付と時間を入れてあとから記録できます</li>
+      <li><b>記録をタップ</b> — 科目・メモ・時間をあとから直せます。まちがえた記録の削除もここから</li>
+      <li>23:50〜0:10 のような<b>夜をまたぐ勉強</b>もそのまま入力OK</li>
+    </ul>
+  </section>
+
+  <section class="card">
+    <h2>📱 ホーム画面にアプリとして追加</h2>
+    <p>アプリストアからのインストールは不要。ブラウザから直接ホーム画面に追加できます。</p>
+    <ul>
+      <li><b>iPhone (Safari)</b> — 画面下の共有ボタン(□に↑)→「<b>ホーム画面に追加</b>」</li>
+      <li><b>Android (Chrome)</b> — 右上のメニュー(⋮)→「<b>アプリをインストール</b>」または「ホーム画面に追加」</li>
+    </ul>
+    <div class="note">追加すると、にじのアイコン🌈から全画面アプリとして起動できて、電波がない場所でも使えます。</div>
+  </section>
+
+  <section class="card">
+    <h2>💾 バックアップと機種変</h2>
+    <ul>
+      <li><b>バックアップする</b> — 記録をファイルとしてスマホに保存できます(共有シートから「ファイルに保存」)</li>
+      <li><b>復元する</b> — バックアップしたファイルを選ぶと記録が戻ります。何回読み込んでも記録がダブらないので安心</li>
+      <li><b>機種変のとき</b> — 古いスマホで「バックアップする」→ ファイルを新しいスマホに送る(LINEやメールでもOK)→ 新しいスマホで「復元する」</li>
+    </ul>
+    <div class="note">記録はブラウザの中に保存されるしくみ上、ブラウザのデータ削除で消えてしまいます。大事な記録は、ときどきバックアップしておくのがおすすめ!</div>
+  </section>
+
+  <section class="card">
+    <h2>🎨 ユニバーサルカラー</h2>
+    <p>「いろの設定」でユニバーサルカラーをONにすると、科目の色が<b>色の見え方がちがう人にも見分けやすい配色</b>(カラーユニバーサルデザイン)に切り替わります。グラフが見分けにくいと感じたら試してみてください。</p>
+  </section>
+
+  <section class="card">
+    <h2>❓ よくある質問</h2>
+    <p><b>Q. 無料ですか?</b><br>A. ずっと無料です。登録も不要です。</p>
+    <p><b>Q. 記録はいつまで残りますか?</b><br>A. 約13ヶ月(400日)です。受験の1年間をまるごと振り返れます。</p>
+    <p><b>Q. パソコンでも使えますか?</b><br>A. 使えます。ただし記録は端末ごとに別々に保存されるので、スマホと共有したいときはバックアップ&復元を使ってください。</p>
+    <p><b>Q. タイマーをつけたまま寝ちゃいました…</b><br>A. 記録をタップすれば、終了時間をあとから直せます。</p>
+  </section>
+
+  <div class="cta"><a href="./">📚 すたログをはじめる</a></div>
+
+  <footer>すたログ — study log timer / <a href="./">アプリにもどる</a></footer>
+</div>
+</body>
+</html>
