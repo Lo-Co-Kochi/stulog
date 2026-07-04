@@ -19,13 +19,13 @@
 <style>
   :root{
     --accent: #8fb7f2;        /* パステルブルー */
-    --accent-deep: #7b88ee;   /* ペリウィンクル */
+    --accent-deep: #5661c9;   /* ペリウィンクル(白背景で5.3:1、WCAG AA確保) */
     --lavender: #c3a6ff;
     --mint: #8ce3d0;
     --coral: #ff9d9d;
     --sun: #ffd166;
     --text: #4e4a5e;
-    --text-soft: #948da0;
+    --text-soft: #756d87;     /* 白背景で4.9:1、WCAG AA確保 */
     --card: #ffffff;
     --radius: 22px;
     --shadow: 0 8px 24px rgba(137, 132, 201, .16);
@@ -248,8 +248,11 @@
   .pill-btn:active{ transform:scale(.95); }
   .export-note{ text-align:center; font-size:11px; color:var(--text-soft); margin-top:10px; line-height:1.7; }
 
-  footer{ text-align:center; font-size:11px; color:#c3aec7; padding-top:6px; }
-  footer a{ color:var(--accent-deep); font-weight:700; }
+  footer{ text-align:center; font-size:11px; color:var(--text-soft); padding-top:6px; }
+  footer a{
+    color:var(--accent-deep); font-weight:700; font-size:15px;
+    display:inline-block; padding:4px 8px 8px;
+  }
 
   /* ---------- settings toggle ---------- */
   .toggle-row{
@@ -427,7 +430,7 @@
   <section class="card">
     <div class="card-title">🎨 いろの設定</div>
     <label class="toggle-row">
-      <span class="toggle-text">ユニバーサルカラー
+      <span class="toggle-text">カラーユニバーサルデザイン
         <small>色の見え方がちがう人にも、科目の色を見分けやすい配色にするよ</small>
       </span>
       <input type="checkbox" id="cudToggle">
