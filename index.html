@@ -250,6 +250,25 @@
 
   footer{ text-align:center; font-size:11px; color:#c3aec7; padding-top:6px; }
 
+  /* ---------- settings toggle ---------- */
+  .toggle-row{
+    display:flex; align-items:center; gap:10px; cursor:pointer;
+  }
+  .toggle-text{ flex:1; font-size:13px; font-weight:700; }
+  .toggle-text small{ display:block; font-size:11px; font-weight:500; color:var(--text-soft); margin-top:2px; }
+  .toggle-row input{ display:none; }
+  .toggle-knob{
+    width:46px; height:26px; border-radius:999px; background:#e4e0ee; flex:none;
+    position:relative; transition:background .2s;
+  }
+  .toggle-knob::after{
+    content:''; position:absolute; top:3px; left:3px; width:20px; height:20px;
+    border-radius:50%; background:#fff; box-shadow:0 2px 6px rgba(88,82,110,.25);
+    transition:left .2s;
+  }
+  .toggle-row input:checked + .toggle-knob{ background:var(--accent-deep); }
+  .toggle-row input:checked + .toggle-knob::after{ left:23px; }
+
   /* ---------- record editor modal ---------- */
   .modal-bg{
     position:fixed; inset:0; background:rgba(88,82,110,.38); z-index:60;
@@ -403,6 +422,18 @@
     </div>
   </section>
 
+  <!-- 設定 -->
+  <section class="card">
+    <div class="card-title">🎨 いろの設定</div>
+    <label class="toggle-row">
+      <span class="toggle-text">ユニバーサルカラー
+        <small>色の見え方がちがう人にも、科目の色を見分けやすい配色にするよ</small>
+      </span>
+      <input type="checkbox" id="cudToggle">
+      <span class="toggle-knob"></span>
+    </label>
+  </section>
+
   <footer>すたログ — study log timer</footer>
 </div>
 
@@ -457,6 +488,9 @@
   ];
   const PALETTE = ['#ff9aa2','#a5d8ff','#c3a6ff','#b5e48c','#ffd166','#8ce3d0','#ffab91','#f9c0de','#9fd8df','#d0a9f5'];
   const FALLBACK_COLOR = '#c9c3d6'; // 削除された科目・旧データ用
+  // ユニバーサルカラー(Okabe-Ito パレット): 色覚タイプによらず見分けやすい配色。
+  // 並び順はプリセット科目(国数英理社)が日本の教科イメージに近くなるように調整
+  const CUD_PALETTE = ['#d55e00','#0072b2','#cc79a7','#009e73','#e69f00','#56b4e9','#f0e442','#999999'];
 
   /* ---------- state ---------- */
   let state = {
@@ -464,7 +498,8 @@
     sessions: [],        // {id, taskName(=科目), note, start(ISO), end(ISO), ms}
     running: null,       // {taskName, note, startedAt(epoch ms)}
     subjects: null,      // [{name, color}]
-    selectedSubject: null
+    selectedSubject: null,
+    cud: false           // ユニバーサルカラー(CUD)モード
   };
 
   function nextColor() {
@@ -505,8 +540,9 @@
   }
 
   function subjectColor(name) {
-    const s = state.subjects.find(x => x.name === name);
-    return s ? s.color : FALLBACK_COLOR;
+    const i = state.subjects.findIndex(x => x.name === name);
+    if (i === -1) return FALLBACK_COLOR;
+    return state.cud ? CUD_PALETTE[i % CUD_PALETTE.length] : state.subjects[i].color;
   }
 
   /* ---------- time utils ---------- */
@@ -697,13 +733,14 @@
     box.innerHTML = '';
     $('editSubjects').textContent = editMode ? 'おわる' : '科目をへらす';
     state.subjects.forEach(sub => {
+      const col = subjectColor(sub.name);
       const b = document.createElement('button');
       b.className = 'chip' + (state.selectedSubject === sub.name && !editMode ? ' selected' : '');
-      b.style.background = sub.color + '55';
+      b.style.background = col + '55';
       b.disabled = !!state.running;
       const dot = document.createElement('span');
       dot.className = 'subj-dot';
-      dot.style.background = sub.color;
+      dot.style.background = col;
       b.appendChild(dot);
       b.appendChild(document.createTextNode(sub.name));
       if (editMode) {
@@ -1173,6 +1210,12 @@
   });
 
   /* ---------- events ---------- */
+  $('cudToggle').onchange = e => {
+    state.cud = e.target.checked;
+    save();
+    render();
+  };
+
   mainBtn.onclick = () => state.running ? stopTimer() : startTimer();
   noteInput.addEventListener('keydown', e => {
     if (e.key === 'Enter' && !state.running) startTimer();
@@ -1182,6 +1225,7 @@
   load();
   save();
   initRange(7);
+  $('cudToggle').checked = !!state.cud;
   render();
 
   /* ---------- PWA(ホーム画面アプリ・オフライン対応) ---------- */
