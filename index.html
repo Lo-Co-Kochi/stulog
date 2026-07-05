@@ -436,6 +436,7 @@
       <div class="bars-scroll"><div class="bars" id="bars"></div></div>
       <div style="height:10px"></div>
       <div id="history"></div>
+      <div class="view-empty" id="ydayEmpty" hidden>きのうの記録はないよ 🌙</div>
       <div class="view-empty" id="pastEmpty">この期間の記録はないよ 🌙</div>
     </div>
 
@@ -952,7 +953,11 @@
 
     renderDonut(list, total);
     renderBars(days);
-    renderHistory(list);
+    // 時系列リストはきのうの分だけ表示(グラフは選択期間のまま)
+    const ydayKey = dateKey(new Date(Date.now() - DAY));
+    const ydayList = state.sessions.filter(s => dateKey(new Date(s.end)) === ydayKey);
+    renderHistory(ydayList);
+    $('ydayEmpty').hidden = !(list.length && !ydayList.length);
 
     $('pastEmpty').style.display = list.length ? 'none' : '';
     $('donutWrap').style.display = list.length ? '' : 'none';
