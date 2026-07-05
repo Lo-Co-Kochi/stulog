@@ -175,6 +175,9 @@
     box-shadow:0 10px 22px rgba(255,157,157,.45);
     animation:breathe 2s ease-in-out infinite;
   }
+  .main-btn.stop::before{
+    content:''; width:34px; height:34px; border-radius:9px; background:#fff;
+  }
   @keyframes breathe{ 0%,100%{transform:scale(1)} 50%{transform:scale(1.05)} }
   .btn-hint{ text-align:center; font-size:12px; color:var(--text-soft); }
 
@@ -284,7 +287,7 @@
 
   footer{ text-align:center; font-size:11px; color:var(--text-soft); padding-top:6px; }
   footer a{
-    color:var(--accent-deep); font-weight:700; font-size:15px;
+    color:var(--accent-deep); font-weight:700; font-size:17px;
     display:inline-block; padding:4px 8px 8px;
   }
 
@@ -381,12 +384,12 @@
     <div class="card-title">🌟 きょうの勉強時間</div>
     <div class="today-total" id="todayTotal">0<small>分</small></div>
     <div class="today-breakdown" id="todayBreakdown"></div>
-    <div class="today-empty" id="todayEmpty">まだ記録がないよ。タイマーをスタートしてみよ!</div>
+    <div class="today-empty" id="todayEmpty">まだ記録がないよ。計測をスタートしてみよ!</div>
   </section>
 
-  <!-- タイマー -->
+  <!-- ログ計測 -->
   <section class="card">
-    <div class="card-title">⏰ タイマー</div>
+    <div class="card-title">⏰ ログ計測</div>
     <div class="sec-label" id="subjectLabel">科目をえらんでね</div>
     <div class="chips" id="subjectChips"></div>
     <div class="chip-tools" id="chipTools">
@@ -473,7 +476,7 @@
     </label>
   </section>
 
-  <footer><a href="guide.html">📖 つかいかたを見る</a><br>すたログ — study log timer</footer>
+  <footer><a href="guide.html">📖 つかいかたを見る</a><br>すたログ — study log tracker</footer>
 </div>
 
 <!-- 記録エディタ -->
@@ -752,7 +755,7 @@
   function render() {
     const running = state.running;
 
-    mainBtn.textContent = running ? '⏹' : '▶';
+    mainBtn.textContent = running ? '' : '▶';   // 停止表示は .stop::before の白い角丸四角
     mainBtn.classList.toggle('stop', !!running);
     mainBtn.setAttribute('aria-label', running ? 'ストップ' : 'スタート');
     clock.classList.toggle('on', !!running);
@@ -761,7 +764,7 @@
     $('runningTask').innerHTML = running
       ? '<span class="dot"></span>「' + esc(running.taskName) + (running.note ? ' / ' + esc(running.note) : '') + '」を勉強中…'
       : '';
-    $('btnHint').textContent = running ? '⏹ を押すと記録されるよ' : '科目をえらんで ▶ でスタート!';
+    $('btnHint').textContent = running ? '■ を押すと記録されるよ' : '科目をえらんで ▶ でスタート!';
     $('chipTools').style.display = running ? 'none' : '';
 
     renderSubjects();

@@ -1,7 +1,7 @@
 {
   "name": "すたログ",
   "short_name": "すたログ",
-  "description": "科目をえらんで再生するだけ。勉強きろくタイマー",
+  "description": "科目をえらんで再生するだけ。勉強きろくアプリ",
   "lang": "ja",
   "start_url": "./",
   "scope": "./",
