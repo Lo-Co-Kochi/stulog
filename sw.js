@@ -1,5 +1,5 @@
 // すたログ Service Worker — オフラインでも起動できるようにする
-const CACHE = 'stalog-v7';
+const CACHE = 'stalog-v8';
 const ASSETS = [
   './',
   './index.html',
