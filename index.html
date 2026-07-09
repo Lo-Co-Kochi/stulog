@@ -14,15 +14,15 @@
      crossorigin="anonymous"></script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>すたログ | 勉強時間を記録する無料のシンプルな勉強タイマーアプリ</title>
-<meta name="description" content="すたログは、科目を選んで▶を押すだけの簡単・シンプルな勉強記録アプリ。受験勉強・テスト勉強・資格勉強の時間が自動でログ(記録)されて、グラフで見える化。無料・登録不要・インストール不要で使える勉強記録ツール。ホーム画面に追加すればアプリとしても使えます。">
+<title>すたログ tracker | 勉強時間を記録する無料のシンプルな勉強タイマーアプリ</title>
+<meta name="description" content="すたログ tracker は、科目を選んで▶を押すだけの簡単・シンプルな勉強記録アプリ。受験勉強・テスト勉強・資格勉強の時間が自動でログ(記録)されて、グラフで見える化。無料・登録不要・インストール不要で使える勉強記録ツール。ホーム画面に追加すればアプリとしても使えます。">
 <meta name="keywords" content="勉強,記録,ログ,タイマー,アプリ,シンプル,簡単,無料,勉強時間,見える化,勉強記録,受験勉強,テスト勉強,資格勉強,ツール,インストール不要">
 <link rel="canonical" href="https://studylog-tracker.com/">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
   "@type": "WebApplication",
-  "name": "すたログ",
+  "name": "すたログ tracker",
   "url": "https://studylog-tracker.com/",
   "description": "科目を選んで▶を押すだけの、簡単・シンプルな勉強記録タイマーアプリ。受験勉強・テスト勉強・資格勉強の時間が自動で記録されて、グラフで見える化できる。無料・登録不要。",
   "applicationCategory": "EducationalApplication",
@@ -34,7 +34,7 @@
 }
 </script>
 <meta property="og:type" content="website">
-<meta property="og:title" content="すたログ | 無料でシンプルな勉強記録タイマー">
+<meta property="og:title" content="すたログ tracker | 無料でシンプルな勉強記録タイマー">
 <meta property="og:description" content="科目をえらんで、▶ おすだけ。勉強時間が、グラフで見える。無料・登録不要。">
 <meta property="og:url" content="https://studylog-tracker.com/">
 <meta property="og:image" content="https://studylog-tracker.com/ogp.png">
@@ -46,7 +46,7 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="apple-mobile-web-app-title" content="すたログ">
+<meta name="apple-mobile-web-app-title" content="すたログ tracker">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@500;700;900&display=swap" rel="stylesheet">
@@ -84,6 +84,11 @@
     background:linear-gradient(90deg,#ff9d76,#eabb45,#6bbf74,#5fa8ee,#a58cf2);
     -webkit-background-clip:text; background-clip:text; color:transparent;
     display:inline-block;
+  }
+  .logo-sub{
+    display:block; font-size:11px; font-weight:700; letter-spacing:.5em;
+    color:var(--text-soft); -webkit-text-fill-color:var(--text-soft);
+    margin:-2px 0 0 .25em;   /* letter-spacing分の右寄りを補正して中央に */
   }
   .tagline{ font-size:12px; color:var(--text-soft); margin-top:2px; }
 
@@ -375,7 +380,7 @@
 <div class="wrap">
 
   <header>
-    <h1 class="logo">すたログ</h1>
+    <h1 class="logo">すたログ<span class="logo-sub">tracker</span></h1>
     <p class="tagline">📚 きょうの勉強、ちゃんと見える化しよ ✏️</p>
   </header>
 

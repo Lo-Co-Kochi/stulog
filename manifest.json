@@ -1,6 +1,6 @@
 {
-  "name": "すたログ",
-  "short_name": "すたログ",
+  "name": "すたログ tracker",
+  "short_name": "すたログ tracker",
   "description": "科目をえらんで再生するだけ。勉強きろくアプリ",
   "lang": "ja",
   "start_url": "./",
